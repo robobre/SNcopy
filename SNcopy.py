@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import paramiko
+import commands
 from scp import SCPClient
 import sys, getopt
 import getpass
@@ -7,6 +8,7 @@ import re
 import os
 from log_parser import metadata_parser
 from database_connector import MYSQL_SIM_DATA
+from datetime import datetime
 
 
 def createSSHClient(server, port, user, password):
@@ -43,7 +45,7 @@ for o, a in opts:
         print "-p password" 
         print "-d destination  path on remote server"
         sys.exit()
-    if o in ("-p", "--passworf"):
+    if o in ("-p", "--password"):
         password=a
     if o in ("-t", "--TarPath"):
         tarPath=a
@@ -73,20 +75,36 @@ if password=="none":
 ssh = createSSHClient(host, 22, username, password)
 scp = SCPClient(ssh.get_transport(),progress=progress)
 scp.put(tarPath,destPath+"/"+os.path.basename(tarPath))
-
+ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("md5sum "+destPath+"/"+os.path.basename(tarPath))
+#print ssh_stdout
+md5sumR="none"
+for line in ssh_stdout.readlines():
+        md5sumR = line.split(" ")[0]
+print md5sumR
+local_out = commands.getoutput("md5sum "+tarPath )
+md5sum=local_out.split(" ")[0]
+print md5sum
+if md5sum==md5sumR:
+    print "md5 test passed"
+else:
+    print "md5 test failed"
+        
 parser=metadata_parser(0)
 parser.parse_file(logPath)
 
-print parser.data
+#print parser.data
 #print os.path.basename(tarPath)
 myconnect=MYSQL_SIM_DATA(0)
 #for comment in sys.stdin: 
 #    if 'q' == comment.rstrip(): 
 #        break
 #    print(f'Input : {comment}') 
+size=os.stat(tarPath).st_size
+now = datetime.now()
+formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
 comment="comment"
-rec1=myconnect.det_runefiles('','',os.path.basename(tarPath),'',0)
+rec1=myconnect.det_runefiles('','',os.path.basename(tarPath),md5sum,size)
 rec=myconnect.det_data(rec1,'1000-01-01',parser.data["run.run_id"],'','1000-01-01','1000-01-01',0,0,comment)
-myconnect.det_ccfile( parser.data['run.run_id'],rec, '',destPath,os.path.basename(tarPath),0,'','','','1000-01-01')
+myconnect.det_ccfile( parser.data['run.run_id'],rec, '',destPath,os.path.basename(tarPath),size,md5sumR,'','',formatted_date)
 
