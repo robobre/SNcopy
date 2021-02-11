@@ -63,10 +63,10 @@ class MYSQL_SIM_DATA:
          cursor.close()
          return record[0]
      
-    def det_runefiles (self,FileID,split_index,filename,Md5sum,filesize):
+    def det_runefiles (self,FileID,split_index,filename,Md5sum,filesize,filesid):
          #type: (MYSQL_SIM_DATA,str,str,int,int,str,str,str)
          cursor=self.connection.cursor()
-         cursor.execute("INSERT INTO det_runfiles ( split_index,filename,Md5sum,filesize) VALUES(%s,%s,%s,%s)",( split_index,filename,Md5sum,filesize))
+         cursor.execute("INSERT INTO det_runfiles ( split_index,filename,Md5sum,filesize,filesID) VALUES(%s,%s,%s,%s,%s)",( split_index,filename,Md5sum,filesize,filesid))
          cursor.execute('SELECT last_insert_id()')
          record = cursor.fetchone()
        #  cursor.execute("UPDATE det_data SET run_file_ID=%s where ID=%s"%(record[0],det_dataID))
@@ -86,7 +86,19 @@ class MYSQL_SIM_DATA:
          cursor.close()
          return record[0]
 
-                 
+
+    def det_datatrans  (self,trans_time,status ):
+       #type:(MYSQL_SIM_DATA,int,int,str,int,int,str,str,str,str)
+         cursor=self.connection.cursor()
+         cursor.execute("INSERT INTO det_filetransfer ( transfer_time, status) VALUES(%s,%s) ",(trans_time,status))
+         cursor.execute('SELECT last_insert_id()')
+         record = cursor.fetchone()
+#         cursor.execute("UPDATE det_data SET run_file_ID=%s where run_number=%s"%(record[0],det_dataID))
+ #         cursor.execute
+         self.connection.commit()
+         cursor.close()
+         return record[0]
+
 #myconnect=MYSQL_SIM_DATA(0)
 #rec=myconnect.init_prod("breier","nieco","nieco","nieco2","nieco3","nieco4")
 #rec1=myconnect.store_simu(rec,"cc","/adresa/suboru/",10000,10,"hash","5.6.7","comentujem si")

@@ -84,11 +84,13 @@ print md5sumR
 local_out = commands.getoutput("md5sum "+tarPath )
 md5sum=local_out.split(" ")[0]
 print md5sum
+test=0
 if md5sum==md5sumR:
     print "md5 test passed"
+    test=0
 else:
     print "md5 test failed"
-        
+    test=1    
 parser=metadata_parser(0)
 parser.parse_file(logPath)
 
@@ -104,7 +106,8 @@ now = datetime.now()
 formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')
 
 comment="comment"
-rec1=myconnect.det_runefiles('','',os.path.basename(tarPath),md5sum,size)
+rec2= myconnect.det_datatrans(test, formatted_date)
+rec1=myconnect.det_runefiles('','',os.path.basename(tarPath),md5sum,size,rec2)
 rec=myconnect.det_data(rec1,'1000-01-01',parser.data["run.run_id"],'','1000-01-01','1000-01-01',0,0,comment)
 myconnect.det_ccfile( parser.data['run.run_id'],rec, '',destPath,os.path.basename(tarPath),size,md5sumR,'','',formatted_date)
 
