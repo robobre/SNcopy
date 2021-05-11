@@ -98,6 +98,12 @@ class MYSQL_SIM_DATA:
          self.connection.commit()
          cursor.close()
          return record[0]
+    def det_data_comitioning(self,Run_date,Operators,run_number,duration,triger,description,comment,Detector_sys):
+         cursor=self.connection.cursor()
+         cursor.execute("INSERT INTO det_comitioning_data (Run_date,Operators,run_number,duration,triger,description,comments,Detector_sys) VALUES(%s,%s,%s,%s,%s,%s,%s,%s) ", (Run_date,Operators,run_number,duration,triger,description,comment,Detector_sys))
+         self.connection.commit()
+         cursor.close()
+
 
 #myconnect=MYSQL_SIM_DATA(0)
 #rec=myconnect.init_prod("breier","nieco","nieco","nieco2","nieco3","nieco4")
