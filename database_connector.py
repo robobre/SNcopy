@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 import mysql.connector
 from mysql.connector import Error
 #from metadata_parser import metadata_parser

@@ -7,15 +7,16 @@ import getopt,sys
 import csv
 def publish_data(filename):
     myDB=database_connector.MYSQL_SIM_DATA()
-    with open(filename,'r') as csv_file:
-      csv_reader = csv.reader(csv_file, delimiter=',')
+    with open(filename,'r',encoding='utf-8') as csv_file:
+      csv_reader = csv.reader(csv_file, delimiter=';')
       line_count = 0
       for row in csv_reader:
          if line_count == 0:
            print(f'Column names are {", ".join(row)}')
            line_count += 1
          else:
-           myDB.det_data_comitioning(row[3],row[2],row[0],row[4],row[5],row[6],row[7],row[1])
+           myDB.det_data_comitioning(row[3].strip(),row[2],row[0],row[4],row[5],row[6],row[7],row[1])
+           print(row[3],row[2],row[0],row[4],row[5],row[6],row[7],row[1])
            line_count += 1
            print(f'Processed {line_count} lines.')
 
